@@ -1,5 +1,7 @@
+package konane
 import scala.annotation.tailrec
-import utils
+import scala.collection.parallel.ParMap
+
 
 case class GameState(
     board: Board,
@@ -12,11 +14,15 @@ case class GameState(
 
   def draw: Unit = GameState.draw(board, height, width)
   def randomMove(): (Coord2D, MyRandom) = GameState.randomMove(openCoords, rand)
-  def play(coordFrom: Coord2D, coordTo: Coord2D): (Option[Board], List[Coord2D])
+  def play(from: Coord2D, to: Coord2D): (Option[Board], List[Coord2D]) = GameState.play(board, turn, from, to)
 }
 
 object GameState {
   def initiallizeBoard(rand: MyRandom, height: Int, width: Int): GameState = {
+    val middleW: Int = width / 2  - 1
+    val middleH: Int = height / 2
+    println(middleW)
+    println(middleH)
 
     @tailrec
     def loop(row: Int, col: Int, board: Board): Board = row match {
@@ -25,11 +31,17 @@ object GameState {
         // Alternate between white and black stones
         val stone: Stone =
           if ((row + col) % 2 == 0) Stone.Black else Stone.White
-        val nextBoard = board + (Coord2D(row, col) -> stone)
+
+        val newBoard = {
+          if (row == middleH  && (col == middleW || col == middleW + 1)) // Initial open slots
+            board
+          else
+            board + (Coord2D(row, col) -> stone)
+        }
 
         // Fill the row until the end, then go to next row
-        if (col < width - 1) loop(row, col + 1, nextBoard)
-        else loop(row + 1, 0, nextBoard)
+        if (col < width - 1) loop(row, col + 1, newBoard)
+        else loop(row + 1, 0, newBoard)
       }
     }
 
@@ -61,13 +73,24 @@ object GameState {
   }
 
   // Devolve a lista de coordenadas livres (Sem peças)
-  def getOpenCoords(board: Board): (List[Coord2D]) = {}
+  def getOpenCoords(board: Board, height: Int, width: Int): (List[Coord2D]) = {
+    
+    @tailrec
+    def loop(row: Int, col: Int):List[Coord2D] = {
+      
+    }
+    
+    loop(0,0)
+  }
 
   // Devolve um random move
   def randomMove(
       openCoords: List[Coord2D],
       rand: MyRandom
-  ): (Coord2D, MyRandom) = {}
+  ): (Coord2D, MyRandom) = {
+    //TODO
+    (Coord2D(-1,-1), rand)
+     }
 
   // Receives and, if allowed, executes a play
   def play(
@@ -75,12 +98,15 @@ object GameState {
       player: Stone,
       coordFrom: Coord2D,
       coordTo: Coord2D
-  ): (Option[Board], List[Coord2D]) = {}
+  ): (Option[Board], List[Coord2D]) = {
+    //TODO
+    (None,Nil)
+  }
 
 }
 
 object MyGame extends App {
   println("----- STARTING GAME -----")
-  val initialGame = GameState.initiallizeBoard(MyRandom(11111111), 10, 11)
-  initialGame.draw()
+  val initialGame = GameState.initiallizeBoard(MyRandom(11111111), 6, 7)
+  initialGame.draw
 }
