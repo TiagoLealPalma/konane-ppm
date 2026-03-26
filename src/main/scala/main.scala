@@ -1,7 +1,10 @@
+//> using jvm 25
+//> using scala 3.5.0
+//> using dep org.scala-lang.modules::scala-parallel-collections:1.0.4
+
 package konane
 import scala.annotation.tailrec
 import scala.collection.parallel.ParMap
-
 
 case class GameState(
     board: Board,
@@ -10,16 +13,17 @@ case class GameState(
     height: Int,
     width: Int
 ) {
-  val openCoords = GameState.getOpenCoords(board)
+  val openCoords = GameState.getOpenCoords(board, height, width)
 
   def draw: Unit = GameState.draw(board, height, width)
   def randomMove(): (Coord2D, MyRandom) = GameState.randomMove(openCoords, rand)
-  def play(from: Coord2D, to: Coord2D): (Option[Board], List[Coord2D]) = GameState.play(board, turn, from, to)
+  def play(from: Coord2D, to: Coord2D): (Option[Board], List[Coord2D]) =
+    GameState.play(board, turn, from, to)
 }
 
 object GameState {
   def initiallizeBoard(rand: MyRandom, height: Int, width: Int): GameState = {
-    val middleW: Int = width / 2  - 1
+    val middleW: Int = width / 2 - 1
     val middleH: Int = height / 2
     println(middleW)
     println(middleH)
@@ -33,7 +37,9 @@ object GameState {
           if ((row + col) % 2 == 0) Stone.Black else Stone.White
 
         val newBoard = {
-          if (row == middleH  && (col == middleW || col == middleW + 1)) // Initial open slots
+          if (
+            row == middleH && (col == middleW || col == middleW + 1)
+          ) // Initial open slots
             board
           else
             board + (Coord2D(row, col) -> stone)
@@ -74,13 +80,24 @@ object GameState {
 
   // Devolve a lista de coordenadas livres (Sem peças)
   def getOpenCoords(board: Board, height: Int, width: Int): (List[Coord2D]) = {
-    
+
     @tailrec
-    def loop(row: Int, col: Int):List[Coord2D] = {
+    def loop(row: Int, col: Int, acc: List[Coord2D]): List[Coord2D] = {
+      if (row >= height) return acc
+
+      val coord = Coord2D(row, col)
+      val stone: Option[Stone] = board.get(coord)
       
+      val newLst = stone match {
+        case None    => coord :: acc
+        case Some(_) => acc
+      }
+
+      if (col < width - 1) loop(row, col + 1, newLst)
+      else                 loop(row + 1, 0, newLst) 
     }
-    
-    loop(0,0)
+
+    loop(0, 0, List())
   }
 
   // Devolve um random move
@@ -88,9 +105,9 @@ object GameState {
       openCoords: List[Coord2D],
       rand: MyRandom
   ): (Coord2D, MyRandom) = {
-    //TODO
-    (Coord2D(-1,-1), rand)
-     }
+    // TODO
+    (Coord2D(-1, -1), rand)
+  }
 
   // Receives and, if allowed, executes a play
   def play(
@@ -99,8 +116,8 @@ object GameState {
       coordFrom: Coord2D,
       coordTo: Coord2D
   ): (Option[Board], List[Coord2D]) = {
-    //TODO
-    (None,Nil)
+    // TODO
+    (None, Nil)
   }
 
 }
@@ -109,4 +126,5 @@ object MyGame extends App {
   println("----- STARTING GAME -----")
   val initialGame = GameState.initiallizeBoard(MyRandom(11111111), 6, 7)
   initialGame.draw
+  println(initialGame.openCoords)
 }
