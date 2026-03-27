@@ -10,15 +10,20 @@ type Board = ParMap[Coord2D, Stone]
 enum Stone:
   case Black, White
 
-
 case class MyRandom(seed: Long) {
-  
-  def nextInt: (Int, MyRandom)  = {
-    val newSeed = (seed * 0x5DEECE66DL + 0xBL) &
-    0xFFFFFFFFFFFFL
+
+  def nextInt: (Int, MyRandom) = {
+    val newSeed = (seed * 0x5deece66dL + 0xbL) &
+      0xffffffffffffL
     val nextRandom = MyRandom(newSeed)
     val n = (newSeed >>> 16).toInt
-   
+
     (n, nextRandom)
   }
+
+  def nextIntBounded(bound: Int): (Int, MyRandom) = {
+    val (n, nextGen) = this.nextInt
+    (math.abs(n) % bound, nextGen)
+  }
+
 }
