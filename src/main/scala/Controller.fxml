@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+
+<GridPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
+  <columnConstraints>
+    <ColumnConstraints prefWidth="60.0" />
+    <ColumnConstraints prefWidth="60.0" />
+    <ColumnConstraints prefWidth="60.0" />
+    <ColumnConstraints prefWidth="60.0" />
+    <ColumnConstraints prefWidth="60.0" />
+    <ColumnConstraints prefWidth="60.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints prefHeight="60.0" />
+    <RowConstraints prefHeight="60.0" />
+    <RowConstraints prefHeight="60.0" />
+    <RowConstraints prefHeight="60.0" />
+    <RowConstraints prefHeight="60.0" />
+    <RowConstraints prefHeight="60.0" />
+  </rowConstraints>
+</GridPane>

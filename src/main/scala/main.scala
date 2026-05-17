@@ -1,11 +1,18 @@
 //> using jvm 25
 //> using scala 3.5.0
 //> using dep org.scala-lang.modules::scala-parallel-collections:1.0.4
+//> using dep org.openjfx:javafx-controls:21
+//> using dep org.openjfx:javafx-fxml:21
 
 package konane
 import scala.annotation.tailrec
 import scala.collection.parallel.ParMap
-import java.io.StreamCorruptedException
+import javafx.application.Application
+import javafx.scene.Scene
+import javafx.scene.layout.{StackPane, VBox, GridPane}
+import javafx.scene.control.Label
+import javafx.stage.Stage
+import javafx.geometry.{Insets, Pos}
 
 case class GameState(
     board: Board,
@@ -37,7 +44,7 @@ object GameState {
 
     @tailrec
     def loop(row: Int, col: Int, board: Board): Board = row match {
-      case row if (row > height) => board
+      case row if (row >= height) => board
       case _                     => {
         // Alternate between white and black stones
         val stone: Stone =
@@ -255,26 +262,33 @@ object GameState {
   }
 }
 
+class KonaneApp extends Application {
+  override def start(stage: Stage): Unit = {
+    val grid = new GridPane()
+
+    val label = new Label("Black's turn")
+    label.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;")
+
+    val errorLabel = new Label("")
+    errorLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: red;")
+
+    val vbox = new VBox(10, grid, label, errorLabel)
+    vbox.setAlignment(Pos.CENTER)
+    vbox.setPadding(new Insets(10))
+
+    val controller = new Controller()
+    controller.grid = grid
+    controller.turnLabel = label
+    controller.errorLabel = errorLabel
+    controller.gameState = GameState.initiallizeBoard(MyRandom(11111113), 7, 6)
+    controller.renderBoard()
+
+    stage.setScene(new Scene(vbox, 400, 500))
+    stage.setTitle("Konane")
+    stage.show()
+  }
+}
+
 object MyGame extends App {
-  println("----- STARTING GAME -----")
-  val initialGame =
-    GameState.initiallizeBoard(MyRandom(11111113), 6, 6)
-  initialGame.draw
-
-  def gameLoop(gameState: GameState, numPlaysLeft: Int): Int =
-    numPlaysLeft match {
-      case 0 => 1
-      case _ => {
-        val (newBoard, newRand, openCoords) = gameState.playRandomly()
-        val newTurn = gameState.turn match {
-          case Stone.Black => Stone.White
-          case Stone.White => Stone.Black
-        }
-        val newGameState = gameState.copy(newBoard.get, newTurn, newRand)
-        newGameState.draw
-        gameLoop(newGameState, numPlaysLeft - 1)
-      }
-    }
-
-  gameLoop(initialGame, 30)
+  Application.launch(classOf[KonaneApp])
 }
